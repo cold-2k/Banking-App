@@ -3,6 +3,7 @@ package model;
 import enums.AccountStatus;
 import enums.AccountType;
 import enums.TransactionType;
+import exception.validation.InvalidAmountException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -40,56 +41,68 @@ public class Account {
 
     // Methods
 
+    // 1. Validations
+
+        // validate the amount <= balance
+        private void validateSufficientBalance(BigDecimal amount) {
+            if (amount.compareTo(balance) > 0) throw new InvalidAmountException(
+                    "Insufficient balance for debit in account with ID: " + accountNumber
+            );
+        }
+
+
     void addTransaction(Transaction transaction) {
         transactions.add(transaction);
     }
 
-    void deposit(BigDecimal amount) {
+    void credit(BigDecimal amount) {
         // amount validation
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Amount cannot be negative");
         }
 
-        // deposit logic
+        // credit logic
         balance = balance.add(amount);
 
         // log the transaction
-        Transaction newTransaction = new Transaction(TransactionType.CREDIT, amount, accountNumber);
+        Transaction newTransaction = new Transaction(
+                TransactionType.CREDIT,
+                amount,
+                amount + " credited to account " + accountNumber
+        );
         this.addTransaction(newTransaction);
     }
 
-    void withdraw(BigDecimal amount) {
+    void debit(BigDecimal amount) {
         // amount validation
         if  (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Amount cannot be negative");
         }
 
-        // withdraw logic
+        // debit logic: balance >= amount
+        validateSufficientBalance(amount);
         balance = balance.subtract(amount);
 
         // log the transaction
-        Transaction newTransaction = new Transaction(TransactionType.DEBIT, amount, accountNumber);
+        Transaction newTransaction = new Transaction(
+                TransactionType.DEBIT,
+                amount,
+                amount + " debited from account " + accountNumber);
         this.addTransaction(newTransaction);
-    }
-
-    void closeAccount() {
-        withdraw(balance);
-        status = AccountStatus.CLOSED;
     }
 
     // Utility Methods
 
     @Override
     public String toString() {
-        return "Account{" +
-                "id=" + accountNumber +
-                ", owner=" + owner.getId() +
-                ", accountType=" + type +
-                ", dateOpened=" + dateOpened +
-                ", balance=" + balance +
-                ", accountStatus=" + status +
-                ", transaction count=" + transactions.size() +
-                '}';
+        return "Account" +
+                "\n\tid=" + accountNumber +
+                "\n\towner=" + owner.getId() +
+                "\n\taccountType=" + type +
+                "\n\tdateOpened=" + dateOpened +
+                "\n\tbalance=" + balance +
+                "\n\taccountStatus=" + status +
+                "\n\ttransaction count=" + transactions.size();
     }
 
     // Getters and Setters
@@ -120,6 +133,10 @@ public class Account {
 
     public List<Transaction> getTransactions() {
         return Collections.unmodifiableList(transactions);
+    }
+
+    void setStatus(AccountStatus status) {
+        this.status = status;
     }
 }
 

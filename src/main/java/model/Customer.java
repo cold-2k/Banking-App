@@ -1,5 +1,7 @@
 package model;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
@@ -19,7 +21,10 @@ public class Customer {
 
     // Constructor
 
-    Customer(String firstName, String lastName, String phoneNumber, String email) {
+    Customer(@NotNull String firstName,
+             @NotNull String lastName,
+             @NotNull String phoneNumber,
+             @NotNull String email) {
         this.id = String.format("CUS%06d", nextId++);
 
         this.firstName = firstName;
@@ -36,22 +41,17 @@ public class Customer {
         accounts.add(account);
     }
 
-    void removeAccount(Account account) {
-        accounts.remove(account);
-    }
-
     // Utility Methods
 
     @Override
     public String toString() {
-        return "Customer{" +
-                "id=" + id +
-                ", firstName=" + firstName +
-                ", lastName=" + lastName +
-                ", phoneNumber=" + phoneNumber +
-                ", email=" + email +
-                ", accounts=" + accounts.size() +
-                '}';
+        return "Customer" +
+                "\n\tid=" + id +
+                "\n\tfirstName=" + firstName +
+                "\n\tlastName=" + lastName +
+                "\n\tphoneNumber=" + phoneNumber +
+                "\n\temail=" + email +
+                "\n\taccounts=" + accounts.size();
     }
 
     // Getters and Setters

@@ -30,12 +30,12 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return "Transaction{" +
-                "id='" +  id + '\'' +
-                ", type=" + type +
-                ", amount=" + amount +
-                ", timestamp=" + timestamp +
-                ", reference='" + reference + '\'' +
+        return "Transaction" +
+                "\n\tid='" +  id + '\'' +
+                "\n\ttype=" + type +
+                "\n\tamount=" + amount +
+                "\n\ttimestamp=" + timestamp +
+                "\n\treference='" + reference + '\'' +
                 '}';
     }
 
