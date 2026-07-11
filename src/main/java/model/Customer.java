@@ -1,5 +1,6 @@
 package model;
 
+import exception.customer.InvalidCustomerException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -9,90 +10,100 @@ import java.util.Collections;
 public class Customer {
     // Data fields
 
-    private static int nextId = 1;
-    private final String id;
-
-    private String firstName;
-    private String lastName;
-    private String phoneNumber;
-    private String email;
-
-    private final List<Account> accounts;
+        private static int nextId = 1;
+        private final String id;
+        private String firstName;
+        private String lastName;
+        private String phoneNumber;
+        private String email;
+        private final List<Account> accounts;
 
     // Constructor
 
-    Customer(@NotNull String firstName,
-             @NotNull String lastName,
-             @NotNull String phoneNumber,
-             @NotNull String email) {
-        this.id = String.format("CUS%06d", nextId++);
+        Customer(String firstName, String lastName, String phoneNumber, String email) {
+            validateNotBlank(firstName, "First Name");
+            validateNotBlank(lastName, "Last Name");
+            validateNotBlank(phoneNumber, "Phone Number");
+            validateNotBlank(email, "Email");
 
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-
-        this.accounts = new ArrayList<>();
-    }
+            this.id = String.format("CUS%06d", nextId++);
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.phoneNumber = phoneNumber;
+            this.email = email;
+            this.accounts = new ArrayList<>();
+        }
 
     // Methods
 
-    void addAccount(Account account) {
+        void addAccount(Account account) {
         accounts.add(account);
     }
 
     // Utility Methods
 
-    @Override
-    public String toString() {
-        return "Customer" +
-                "\n\tid=" + id +
-                "\n\tfirstName=" + firstName +
-                "\n\tlastName=" + lastName +
-                "\n\tphoneNumber=" + phoneNumber +
-                "\n\temail=" + email +
-                "\n\taccounts=" + accounts.size();
-    }
+        // 1. Validations
 
-    // Getters and Setters
+            // validate non-blank value
+            private void validateNotBlank(String value, String fieldName) {
+                if (value == null || value.isBlank()) {
+                    throw new InvalidCustomerException(fieldName + " cannot be blank.");
+                }
+            }
 
-    public String getId() {
-        return id;
-    }
+        // 2. Miscellaneous
 
-    public List<Account> getAccounts() {
-        return Collections.unmodifiableList(accounts);
-    }
+            // overridden toString method for clear printing of Customer's state
+            @Override
+            public String toString() {
+                return "Customer" +
+                        "\n\tid=" + id +
+                        "\n\tfirstName=" + firstName +
+                        "\n\tlastName=" + lastName +
+                        "\n\tphoneNumber=" + phoneNumber +
+                        "\n\temail=" + email +
+                        "\n\taccounts=" + accounts.size();
+            }
 
-    public String getFirstName() {
-        return firstName;
-    }
+        // Getters and Setters
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+            public String getId() {
+                return id;
+            }
 
-    public String getLastName() {
-        return lastName;
-    }
+            public List<Account> getAccounts() {
+                return Collections.unmodifiableList(accounts);
+            }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+            public String getFirstName() {
+                return firstName;
+            }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
+            public void setFirstName(String firstName) {
+                this.firstName = firstName;
+            }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
+            public String getLastName() {
+                return lastName;
+            }
 
-    public String getEmail() {
-        return email;
-    }
+            public void setLastName(String lastName) {
+                this.lastName = lastName;
+            }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+            public String getPhoneNumber() {
+                return phoneNumber;
+            }
+
+            public void setPhoneNumber(String phoneNumber) {
+                this.phoneNumber = phoneNumber;
+            }
+
+            public String getEmail() {
+                return email;
+            }
+
+            public void setEmail(String email) {
+                this.email = email;
+            }
 }

@@ -14,129 +14,131 @@ import java.util.List;
 public class Account {
     // Data Fields
 
-    private static int nextId = 1;
-    private final String accountNumber;
-    private final Customer owner;
-    private final AccountType type;
-    private final LocalDate dateOpened;
-
-    private BigDecimal balance;
-    private AccountStatus status;
-
-    private final List<Transaction> transactions;
+        private static int nextId = 1;
+        private final String accountNumber;
+        private final Customer owner;
+        private final AccountType type;
+        private final LocalDate dateOpened;
+        private BigDecimal balance;
+        private AccountStatus status;
+        private final List<Transaction> transactions;
 
     // Constructor
 
-    Account(Customer owner, AccountType type) {
-        this.accountNumber = String.format("ACC%06d", nextId++);
+        Account(Customer owner, AccountType type) {
+            this.accountNumber = String.format("ACC%06d", nextId++);
 
-        this.dateOpened = LocalDate.now();
-        this.balance = BigDecimal.ZERO;
-        this.status = AccountStatus.ACTIVE;
-        this.transactions = new ArrayList<>();
+            this.dateOpened = LocalDate.now();
+            this.balance = BigDecimal.ZERO;
+            this.status = AccountStatus.ACTIVE;
+            this.transactions = new ArrayList<>();
 
-        this.owner = owner;
-        this.type = type;
-    }
+            this.owner = owner;
+            this.type = type;
+        }
 
     // Methods
 
-    // 1. Validations
+        // 1. Validations
 
-        // validate the amount <= balance
-        private void validateSufficientBalance(BigDecimal amount) {
-            if (amount.compareTo(balance) > 0) throw new InvalidAmountException(
-                    "Insufficient balance for debit in account with ID: " + accountNumber
-            );
-        }
+            // validate the amount <= balance
+            private void validateSufficientBalance(BigDecimal amount) {
+                if (amount.compareTo(balance) > 0) throw new InvalidAmountException(
+                        "Insufficient balance for debit in account with ID: " + accountNumber
+                );
+            }
 
+        // 2. Utility
 
-    void addTransaction(Transaction transaction) {
+            // add a new transaction to the transactions list for an account
+            void addTransaction(Transaction transaction) {
         transactions.add(transaction);
     }
 
-    void credit(BigDecimal amount) {
-        // amount validation
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Amount cannot be negative");
+            // validate and add an amount to an account
+            void credit(BigDecimal amount) {
+                // amount validation
+                if (amount.compareTo(BigDecimal.ZERO) < 0) {
+                    throw new IllegalArgumentException("Amount cannot be negative");
+                }
+
+                // credit logic
+                balance = balance.add(amount);
+
+                // log the transaction
+                Transaction newTransaction = new Transaction(
+                        TransactionType.CREDIT,
+                        amount,
+                        amount + " credited to account " + accountNumber
+                );
+                this.addTransaction(newTransaction);
+            }
+
+            // validate and subtract an amount to an account
+            void debit(BigDecimal amount) {
+                // amount validation
+                if  (amount.compareTo(BigDecimal.ZERO) < 0) {
+                    throw new IllegalArgumentException("Amount cannot be negative");
+                }
+
+                // debit logic: balance >= amount
+                validateSufficientBalance(amount);
+                balance = balance.subtract(amount);
+
+                // log the transaction
+                Transaction newTransaction = new Transaction(
+                        TransactionType.DEBIT,
+                        amount,
+                        amount + " debited from account " + accountNumber);
+                this.addTransaction(newTransaction);
+            }
+
+    // 3. Miscellaneous
+
+        @Override
+        public String toString() {
+            return "Account" +
+                    "\n\tid=" + accountNumber +
+                    "\n\towner=" + owner.getId() +
+                    "\n\taccountType=" + type +
+                    "\n\tdateOpened=" + dateOpened +
+                    "\n\tbalance=" + balance +
+                    "\n\taccountStatus=" + status +
+                    "\n\ttransaction count=" + transactions.size();
         }
 
-        // credit logic
-        balance = balance.add(amount);
+    // 4. Getters and Setters
 
-        // log the transaction
-        Transaction newTransaction = new Transaction(
-                TransactionType.CREDIT,
-                amount,
-                amount + " credited to account " + accountNumber
-        );
-        this.addTransaction(newTransaction);
-    }
-
-    void debit(BigDecimal amount) {
-        // amount validation
-        if  (amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Amount cannot be negative");
+        public String getAccountNumber() {
+            return accountNumber;
         }
 
-        // debit logic: balance >= amount
-        validateSufficientBalance(amount);
-        balance = balance.subtract(amount);
+        public Customer getOwner() {
+            return owner;
+        }
 
-        // log the transaction
-        Transaction newTransaction = new Transaction(
-                TransactionType.DEBIT,
-                amount,
-                amount + " debited from account " + accountNumber);
-        this.addTransaction(newTransaction);
-    }
+        public AccountType getType() {
+            return type;
+        }
 
-    // Utility Methods
+        public LocalDate getDateOpened() {
+            return dateOpened;
+        }
 
-    @Override
-    public String toString() {
-        return "Account" +
-                "\n\tid=" + accountNumber +
-                "\n\towner=" + owner.getId() +
-                "\n\taccountType=" + type +
-                "\n\tdateOpened=" + dateOpened +
-                "\n\tbalance=" + balance +
-                "\n\taccountStatus=" + status +
-                "\n\ttransaction count=" + transactions.size();
-    }
+        public BigDecimal getBalance() {
+            return balance;
+        }
 
-    // Getters and Setters
+        public AccountStatus getStatus() {
+            return status;
+        }
 
-    public String getAccountNumber() {
-        return accountNumber;
-    }
+        public List<Transaction> getTransactions() {
+            return Collections.unmodifiableList(transactions);
+        }
 
-    public Customer getOwner() {
-        return owner;
-    }
-
-    public AccountType getType() {
-        return type;
-    }
-
-    public LocalDate getDateOpened() {
-        return dateOpened;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public AccountStatus getStatus() {
-        return status;
-    }
-
-    public List<Transaction> getTransactions() {
-        return Collections.unmodifiableList(transactions);
-    }
-
-    void setStatus(AccountStatus status) {
-        this.status = status;
-    }
+        void setStatus(AccountStatus status) {
+            this.status = status;
+        }
 }
 
